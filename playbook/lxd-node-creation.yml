@@ -7,6 +7,10 @@
     prompt: "Sudo password"
     private: yes
   
+  - name: "nb_node_to_create"
+    prompt: "Nb of node to create"
+    default: 3
+  
   tasks:
   - name: Create a started container
     lxd_container:
@@ -21,7 +25,7 @@
       profiles: ["default"]
       wait_for_ipv4_addresses: true
       timeout: 600
-    with_sequence: count=4
+    with_sequence: count={{ nb_node_to_create }}
   
   - name: Install the package "jq"
     apt:
