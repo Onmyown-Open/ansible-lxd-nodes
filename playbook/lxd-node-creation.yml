@@ -2,11 +2,6 @@
 - hosts: localhost
   connection: local
   
-  vars_prompt:
-  - name: "ansible_sudo_pass"
-    prompt: "Sudo password"
-    private: yes
-  
   - name: "nb_node_to_create"
     prompt: "Nb of node to create"
     default: 3
@@ -27,15 +22,11 @@
       timeout: 600
     with_sequence: count={{ nb_node_to_create }}
   
-  - name: Install the package "jq"
-    apt:
-      name: jq
-      state: present
-    become: yes
-  
-  - name: Create hosts file with all LXD Containers
-    shell: INVENTORY_PATH='../inventory/hosts' && echo '[lxd_container_group]' > $INVENTORY_PATH && lxc list --format json | jq '.[]'.name | cut -d '"' -f 2 >> $INVENTORY_PATH
-  
+  - name: Create hosts file from template file
+    template:
+      src: ../tmpl-file/hosts.j2
+      dest: ../inventory/hosts
+    
   - name: Refresh inventory to ensure new instaces exist in inventory
     meta: refresh_inventory
 
