@@ -18,7 +18,7 @@ Localy create LXD nodes:
 ansible-playbook playbook/lxd-node-creation.yml
 ```
 
-You will be asked for your sudo password (needed to install an utilitaire used in the hosts file creation process) and for the nuber of node you want to create.
+You will be asked for the number of node you want to create.
 
 Delete created LXD nodes:
 ```
