@@ -1,0 +1,11 @@
+---
+- hosts: localhost
+  connection: local
+  vars:
+    HOST_COUNT: "{{ groups['lxd_container_group'] | length }}"
+  tasks:
+  - name: Delete all started container
+    lxd_container:
+      name: node-{{ item }}
+      state: absent
+    with_sequence: count={{ HOST_COUNT }}

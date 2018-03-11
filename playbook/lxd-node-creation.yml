@@ -1,0 +1,48 @@
+---
+- hosts: localhost
+  connection: local
+  
+  vars_prompt:
+  - name: "ansible_sudo_pass"
+    prompt: "Sudo password"
+    private: yes
+  
+  tasks:
+  - name: Create a started container
+    lxd_container:
+      name: node-{{ item }}
+      state: started
+      source:
+        type: image
+        mode: pull
+        server: https://images.linuxcontainers.org
+        protocol: simplestreams
+        alias: debian/9
+      profiles: ["default"]
+      wait_for_ipv4_addresses: true
+      timeout: 600
+    with_sequence: count=4
+  
+  - name: Install the package "jq"
+    apt:
+      name: jq
+      state: present
+    become: yes
+  
+  - name: Create hosts file with all LXD Containers
+    shell: INVENTORY_PATH='../inventory/hosts' && echo '[lxd_container_group]' > $INVENTORY_PATH && lxc list --format json | jq '.[]'.name | cut -d '"' -f 2 >> $INVENTORY_PATH
+  
+  - name: Refresh inventory to ensure new instaces exist in inventory
+    meta: refresh_inventory
+
+- hosts: lxd_container_group
+  gather_facts: False
+  tasks:
+    - name: Install python
+      raw: apt-get install -y python
+
+- hosts: lxd_container_group
+  tasks:
+    - name: Update all packages to the latest version
+      apt:
+        upgrade: dist
