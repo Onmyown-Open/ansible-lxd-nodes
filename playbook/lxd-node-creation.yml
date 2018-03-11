@@ -2,10 +2,11 @@
 - hosts: localhost
   connection: local
   
+  vars_prompt:
   - name: "nb_node_to_create"
     prompt: "Nb of node to create"
     default: 3
-  
+
   tasks:
   - name: Create a started container
     lxd_container:

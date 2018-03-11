@@ -1,0 +1,5 @@
+[lxd_container_group]
+node-[1:3]
+
+[lxd_container_group:vars]
+ansible_connection=lxd
