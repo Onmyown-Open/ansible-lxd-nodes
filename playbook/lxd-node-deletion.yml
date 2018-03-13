@@ -9,3 +9,7 @@
       name: node-{{ item }}
       state: absent
     with_sequence: count={{ HOST_COUNT }}
+  - name: Clean artifact path
+    file:
+      state: absent
+      path: ../inventory/hosts
