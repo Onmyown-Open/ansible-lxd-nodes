@@ -8,7 +8,7 @@
     default: 3
 
   tasks:
-  - name: Create a started container
+  - name: Create started container
     lxd_container:
       name: node-{{ item }}
       state: started
@@ -17,7 +17,9 @@
         mode: pull
         server: https://images.linuxcontainers.org
         protocol: simplestreams
-        alias: debian/9
+        #alias: centos/7
+        #protocol: lxd
+        alias: ubuntu/xenial
       profiles: ["default"]
       wait_for_ipv4_addresses: true
       timeout: 600
@@ -34,11 +36,23 @@
 - hosts: lxd_container_group
   gather_facts: False
   tasks:
-    - name: Install python
-      raw: apt-get install -y python
+  - name: Install python - Debian family
+    raw: apt-get install -y python
+    ignore_errors: true
+
+  - name: Install python - RedHat family
+    raw: yum install -y python
+    ignore_errors: true
 
 - hosts: lxd_container_group
   tasks:
-    - name: Update all packages to the latest version
-      apt:
-        upgrade: dist
+  - name: Update all packages to the latest version - Debian family
+    apt:
+      upgrade: dist
+    when: ansible_os_family == "Debian"
+
+  - name: Update all packages to the latest version - RedHat family
+    yum:
+      name: '*'
+      state: latest
+    when: ansible_os_family == "RedHat"
